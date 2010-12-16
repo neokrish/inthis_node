@@ -1,0 +1,69 @@
+<?php
+// $Id$
+
+function inthis_node_menu() {
+  $items = array();
+  $items['admin/config/inthis-node'] = array(
+    'title' => 'Inthis Node configuration',
+    'description' => 'Configure node information blocks',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('inthis_node_config'),
+    'access arguments' => array('access content'), 
+  );
+  return $items;
+}
+
+function inthis_node_config($form_state) {
+  $node_bundles = field_info_bundles('node');
+ 
+ // dsm($node_bundles);
+  foreach($node_bundles as $nb_key => $node_bundle) {
+    $field_bundles = field_info_instances('node', $nb_key);
+ dsm($field_bundles);    
+      $form[$nb_key] = array(
+        '#type' => 'fieldset',
+        '#title' => $node_bundle['label'],
+        '#tree' => TRUE,
+      );
+    foreach($field_bundles as $key => $field) {
+      $form[$nb_key][$key] = array(
+        '#type' => 'checkbox',
+        '#title' => $field['label'],
+        '#default_value' =>  variable_get('log', 0),
+        '#description' => t('The log.'),
+      );    
+    }
+  }
+  return $form;
+}
+
+/**
+* Implements hook_block_info().
+*/
+function inthis_node_block_info() {
+  $blocks = array();
+  $blocks['inthis_node_test'] = array(
+    'info' => t('About node dump.'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+function inthis_node_block_view($delta = '') {
+  global $user;
+  $node = node_load(arg(1));
+
+  $block = array();
+  switch ($delta) {
+    case 'inthis_node_test':
+      if ($user->uid) {
+      $var =  '<pre>' . print_r($node, true) . '</pre>';
+        $block['content'] =  $var;
+      }
+      break;
+  }
+  return $block;
+}

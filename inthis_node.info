@@ -1,0 +1,8 @@
+; $Id$
+name = In this Node.
+description = "Display information about node in a block"
+core = 7.x
+package = Neokrish
+dependencies[] = taxonomy
+files[] = inthis_node.module
+configure = admin/config/inthis-node
